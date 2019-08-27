@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	localPort = 8000
+	localPort = 8001
 )
 
 var allowedUsers = []string{"reda", "pi"}
@@ -23,7 +23,7 @@ func main() {
 func handler(w http.ResponseWriter, r *http.Request) {
 	tcp_data := GOnetstat.Tcp()
 	searchStr := r.RemoteAddr
-	fmt.Fprint(w, tcp_data)
+	//fmt.Fprint(w, tcp_data)
 	for _, p := range tcp_data {
 		if p.ForeignPort == localPort && searchStr == fmt.Sprintf("%s:%d", p.Ip, p.Port) {
 			if contains(allowedUsers, p.User) {
@@ -33,9 +33,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			} else {
 				fmt.Fprintf(w, "User %s didn't pass the test\n", p.User)
 			}
-			break
+			return
 		}
 	}
+	fmt.Fprintf(w, "You are not running on localhost! go away!\n")
 }
 
 func contains(slice []string, item string) bool {
